@@ -1,0 +1,6 @@
+for ($var = 1; $var -le 5; $var++) {
+    #Write-Host "The value of Var is: $var"
+    $fileName = "File$var.txt"
+    $filePath = Join-Path 'C:\Users\busettod\OneDrive\Desktop\WEB DEVELOPER FULL STACK\POWERSHELL\PrimaCartellina\' $fileName 
+    New-Item -Path $filePath -ItemType file
+}
