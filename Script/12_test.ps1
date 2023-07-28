@@ -1,3 +1,4 @@
+Add-Type -AssemblyName System.Windows.Forms
 Function Show-Menu {
     Clear-Host
     Write-Host "1. Creare una cartella"
@@ -73,8 +74,16 @@ function Delete-Folder {
         [string]$FolderPath
     )
     
-    Remove-Item -Path $FolderPath -Recurse -Force
-    Write-Host "Folder deleted: $FolderPath"
+    $confirmationMessage = "Are you sure you want to delete the folder:`n$FolderPath"
+    $confirmResult = Show-ConfirmationDialog "Delete Folder" $confirmationMessage
+    
+    if ($confirmResult -eq [System.Windows.Forms.DialogResult]::Yes) {
+        Remove-Item -Path $FolderPath -Recurse -Force
+        Write-Host "Folder deleted: $FolderPath"
+    } else {
+        Write-Host "Deletion canceled by user."
+    }
+    
     Read-Host "Press Enter to continue..."
 }
 
@@ -84,10 +93,59 @@ function Delete-File {
         [string]$FilePath
     )
     
-    Remove-Item -Path $FilePath -Force
-    Write-Host "File deleted: $FilePath"
+    $confirmationMessage = "Are you sure you want to delete the file:`n$FilePath"
+    $confirmResult = Show-ConfirmationDialog "Delete File" $confirmationMessage
+    
+    if ($confirmResult -eq [System.Windows.Forms.DialogResult]::Yes) {
+        Remove-Item -Path $FilePath -Force
+        Write-Host "File deleted: $FilePath"
+    } else {
+        Write-Host "Deletion canceled by user."
+    }
+    
     Read-Host "Press Enter to continue..."
 }
+
+function Show-ConfirmationDialog($title, $message) {
+    $confirmationPrompt = New-Object Windows.Forms.Form
+    $confirmationPrompt.Text = $title
+    $confirmationPrompt.Size = New-Object Drawing.Size(300, 150)
+    $confirmationPrompt.StartPosition = "CenterScreen"
+
+    $messageLabel = New-Object Windows.Forms.Label
+    $messageLabel.Text = $message
+    $messageLabel.AutoSize = $true
+    $messageLabel.Location = New-Object Drawing.Point(20, 20)
+
+    $yesButton = New-Object Windows.Forms.Button
+    $yesButton.Text = "Yes"
+    $yesButton.Size = New-Object Drawing.Size(80, 30)
+    $yesButton.Location = New-Object Drawing.Point(40, 100)
+
+    $noButton = New-Object Windows.Forms.Button
+    $noButton.Text = "No"
+    $noButton.Size = New-Object Drawing.Size(80, 30)
+    $noButton.Location = New-Object Drawing.Point(180, 100)
+
+    $yesButton.Add_Click({
+        $confirmationPrompt.DialogResult = [System.Windows.Forms.DialogResult]::Yes
+        $confirmationPrompt.Close()
+    })
+
+    $noButton.Add_Click({
+        $confirmationPrompt.DialogResult = [System.Windows.Forms.DialogResult]::No
+        $confirmationPrompt.Close()
+    })
+
+    $confirmationPrompt.Controls.Add($messageLabel)
+    $confirmationPrompt.Controls.Add($yesButton)
+    $confirmationPrompt.Controls.Add($noButton)
+
+    $confirmationPrompt.ShowDialog()
+
+    return $confirmationPrompt.DialogResult
+}
+
 
 function Move-Folder {
     param (
