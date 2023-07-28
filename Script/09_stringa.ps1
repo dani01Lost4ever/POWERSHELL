@@ -21,3 +21,10 @@ if($string5.Contains("aa")){
 }else{
     Write-Host "no bro"
 }
+
+$email="a@a.it"
+if($email.IndexOf("@") -eq 1){
+    Write-Host "contiene @"
+}else{
+    Write-Host "non contiene"
+}
